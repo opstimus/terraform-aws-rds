@@ -1,100 +1,87 @@
-# AWS RDS Instance
+# AWS RDS Module
 
 ## Description
 
-This Terraform module creates an Amazon RDS database instance, with optional automatic storage scaling, password stored in Secrets Manager, and system parameters stored in Systems Manager Parameter Store.
+This module provisions AWS RDS resources, including a DB instance, security group, Secrets Manager secret for password storage, CloudWatch alarms, and SSM parameters for storing instance details.
 
 ## Requirements
 
-| Name | Version |
-|------|---------|
+| Name      | Version  |
+|-----------|----------|
 | terraform | >= 1.3.0 |
-| aws | ~> 4.0 |
-| external | >= 2.2.0 |
-| random | >= 3.4.0 |
-| time | ~> 0.9 |
+| aws       | >= 4.0   |
+| external  | >= 2.2.0 |
+| random    | >= 3.4.0 |
+| time      | >= 0.9   |
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| aws | ~> 4.0 |
+| Name | Version  |
+|------|----------|
+| aws  | >= 4.0   |
 | external | >= 2.2.0 |
 | random | >= 3.4.0 |
-| time | ~> 0.9 |
+| time | >= 0.9 |
 
 ## Inputs
 
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| project | Project name | `string` | - | yes |
-| environment | Environment name | `string` | - | yes |
-| engine | Engine type (mysql, postgresql) | `string` | - | yes |
-| engine_version | Engine version (i.e 5.7.33) | `string` | - | yes |
-| instancetype | Instance type (micro, medium, or large) | `string` | `db.t3.micro` | no |
-| storage_type | Storage type | `string` | `gp2` | no |
-| allocated_storage | Storage amount | `number` | - | yes |
-| autoscaling | Enable autoscaling | `bool` | `false` | no |
-| max_allocated_storage | Autoscale max storage amount | `number` | - | yes (if autoscaling is true) |
-| db_name | Default database name | `string` | - | yes |
-| username | Master username | `string` | `admin` | no |
-| parameter_group_family | Custom parameter group family | `string` | - | yes |
-| multi_az | Enable multi AZ | `bool` | `false` | no |
-| skip_final_snapshot | Skip final snapshot | `bool` | `true` | no |
-| deletion_protection | Enable deletion protection | `bool` | `false` | no |
-| backup_retention_period | Backup stored period | `number` | `30` | no |
-| storage_encrypted | Enable storage encryption | `bool` | `true` | no |
-| vpc_id | VPC ID | `string` | - | yes |
-| private_subnet_ids | List of private subnet IDs | `list(string)` | - | yes |
-| vpc_cidr | VPC CIDR block | `string` | - | yes |
-| enable_performance_insights | Enable Performance Insights | `bool` | - | yes |
-| parameter_group_parameters | List of parameters for the parameter group | `list(object({ name = string, value = string }))` | - | yes |
-| kms_key_id | KMS key ID to use when storage encryption is true | `string` | - | yes (if storage_encrypted is true) |
+| Name                        | Description                                    | Type            | Default           | Required |
+|-----------------------------|------------------------------------------------|-----------------|-------------------|:--------:|
+| project                     | Project name                                   | `string`        | -                 |   yes    |
+| environment                 | Environment name                               | `string`        | -                 |   yes    |
+| engine                      | Database engine (mysql, postgresql)            | `string`        | -                 |   yes    |
+| engine_version              | Database engine version                        | `string`        | -                 |   yes    |
+| instancetype                | DB instance type                               | `string`        | "db.t3.micro"     |   no     |
+| storage_type                | DB storage type                                | `string`        | "gp2"             |   no     |
+| allocated_storage           | Allocated storage for the DB instance          | `number`        | -                 |   yes    |
+| autoscaling                 | Enable autoscaling for storage                 | `bool`          | false             |   no     |
+| max_allocated_storage       | Maximum storage for autoscaling                | `number`        | -                 |   no     |
+| db_name                     | Default database name                          | `string`        | -                 |   yes    |
+| username                    | Master username for the DB                     | `string`        | "admin"           |   no     |
+| parameter_group_family      | DB parameter group family                      | `string`        | -                 |   yes    |
+| multi_az                    | Enable multi-AZ deployment                     | `bool`          | false             |   no     |
+| skip_final_snapshot         | Skip final snapshot before deletion            | `bool`          | true              |   no     |
+| snapshot_identifier         | Snapshot identifier for restoring the instance | `string`        | ""                |   no     |
+| deletion_protection         | Enable deletion protection                     | `bool`          | false             |   no     |
+| backup_retention_period     | Backup retention period                        | `number`        | 30                |   no     |
+| storage_encrypted           | Enable encryption for DB storage               | `bool`          | true              |   no     |
+| vpc_id                      | VPC ID for the DB instance                     | `string`        | -                 |   yes    |
+| private_subnet_ids          | List of private subnet IDs                     | `list(string)`  | -                 |   yes    |
+| vpc_cidr                    | CIDR block of the VPC                          | `string`        | -                 |   yes    |
+| enable_performance_insights | Enable performance insights                    | `bool`          | -                 |   no     |
+| parameter_group_parameters  | Parameters for the DB parameter group          | `list(object)`  | []                |   no     |
+| kms_key_id                  | KMS key ID for encryption                      | `string`        | -                 |   no     |
+| alarm_sns_arn               | SNS topic ARN for alarm notifications          | `string`        | ""                |   no     |
+| enable_cpu_alarm            | Enable CPU utilization alarms                  | `bool`          | false             |   no     |
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| db_password_secret | The Secrets Manager secret name for the DB password |
+| Name              | Description                          |
+|-------------------|--------------------------------------|
+| db_password_secret| The name of the Secrets Manager secret for the DB password |
 
-## Example Usage
+## Usage examples
+
+### Basic Usage Example
 
 ```hcl
-module "db_instance" {
-  source                    = "s3::https://s3.amazonaws.com/ot-turbo-artifacts/tf/modules/aws/dev/rds.zip"
-
-  project                   = "my_project"
-  environment               = "my_environment"
-  engine                    = "mysql"
-  engine_version            = "5.7.33"
-  instancetype              = "db.t3.medium"
-  storage_type              = "gp2"
-  allocated_storage         = 20
-  autoscaling               = true
-  max_allocated_storage     = 100
-  db_name                   = "my_database"
-  username                  = "admin"
-  parameter_group_family    = "mysql5.7"
-  multi_az                  = false
-  skip_final_snapshot       = true
-  deletion_protection       = false
-  backup_retention_period   = 30
-  storage_encrypted         = true
-  vpc_id                    = "vpc-abc123"
-  private_subnet_ids        = ["subnet-abc123", "subnet-def456"]
-  vpc_cidr                  = "10.0.0.0/16"
-  enable_performance_insights = true
-  parameter_group_parameters = [
-    {
-      name  = "long_query_time"
-      value = "0.5"
-    },
-    {
-      name  = "event_scheduler"
-      value = "ON"
-    }
-  ]
-  kms_key_id                = "arn:aws:kms:us-west-2:111122223333:key/abcd1234a1234567890a1234567890a123"
+module "rds" {
+  source                  = "https://github.com/opstimus/terraform-aws-rds?ref=v<RELEASE>"
+  project                 = "my-project"
+  environment             = "production"
+  engine                  = "mysql"
+  engine_version          = "5.7.33"
+  instancetype            = "db.t3.medium"
+  allocated_storage       = 100
+  vpc_id                  = "vpc-123456"
+  private_subnet_ids      = ["subnet-123456", "subnet-654321"]
+  vpc_cidr                = "10.0.0.0/16"
+  db_name                 = "mydb"
+  username                = "admin"
+  parameter_group_family  = "mysql5.7"
+  backup_retention_period = 7
+  enable_cpu_alarm        = true
+  alarm_sns_arn           = "arn:aws:sns:us-east-1:123456789012:my-topic"
 }
 ```
 
