@@ -58,8 +58,6 @@ This module provisions AWS RDS resources, including a DB instance, security grou
 
 | Name              | Description                          |
 |-------------------|--------------------------------------|
-| vpc_id            | The ID of the VPC                    |
-| vpc_cidr          | The CIDR block of the VPC            |
 | db_password_secret| The name of the Secrets Manager secret for the DB password |
 
 ## Usage examples
