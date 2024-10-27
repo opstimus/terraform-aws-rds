@@ -53,7 +53,7 @@ variable "db_name" {
 variable "username" {
   type        = string
   description = "Master username"
-  default     = "admin"
+  default     = "opadmin"
 }
 
 variable "parameter_group_family" {
