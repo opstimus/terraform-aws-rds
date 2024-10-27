@@ -37,7 +37,7 @@ This module provisions AWS RDS resources, including a DB instance, security grou
 | autoscaling                 | Enable autoscaling for storage                 | `bool`          | false             |   no     |
 | max_allocated_storage       | Maximum storage for autoscaling                | `number`        | -                 |   no     |
 | db_name                     | Default database name                          | `string`        | -                 |   yes    |
-| username                    | Master username for the DB                     | `string`        | "admin"           |   no     |
+| username                    | Master username for the DB                     | `string`        | "opadmin"           |   no     |
 | parameter_group_family      | DB parameter group family                      | `string`        | -                 |   yes    |
 | multi_az                    | Enable multi-AZ deployment                     | `bool`          | false             |   no     |
 | skip_final_snapshot         | Skip final snapshot before deletion            | `bool`          | true              |   no     |
