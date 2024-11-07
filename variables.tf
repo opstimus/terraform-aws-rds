@@ -131,3 +131,11 @@ variable "enable_cpu_alarm" {
   description = "Enable CPU alarm"
   default     = false
 }
+
+variable "from_port" {
+  type = number
+}
+
+variable "to_port" {
+  type = number
+}
