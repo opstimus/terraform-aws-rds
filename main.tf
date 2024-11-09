@@ -90,7 +90,7 @@ resource "aws_db_instance" "main" {
   snapshot_identifier          = var.snapshot_identifier != "" ? var.snapshot_identifier : null
   deletion_protection          = var.deletion_protection
   backup_retention_period      = var.backup_retention_period
-  identifier                   = "${var.project}-${var.environment}"
+  identifier                   = "${var.project}-${var.environment}${local.name}"
   storage_encrypted            = var.storage_encrypted
   kms_key_id                   = var.storage_encrypted == true ? var.kms_key_id : null
   vpc_security_group_ids       = [aws_security_group.db.id]
