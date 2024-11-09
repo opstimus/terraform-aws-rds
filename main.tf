@@ -73,6 +73,7 @@ resource "aws_db_instance" "main" {
   apply_immediately            = true
   engine                       = var.engine
   engine_version               = var.engine_version
+  license_model                = var.license_model
   parameter_group_name         = length(aws_db_parameter_group.main) > 0 ? aws_db_parameter_group.main[0].name : "default.${var.parameter_group_family}"
   auto_minor_version_upgrade   = false
   db_subnet_group_name         = aws_db_subnet_group.main.name

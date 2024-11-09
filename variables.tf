@@ -24,6 +24,10 @@ variable "engine_version" {
   description = "i.e 5.7.33"
 }
 
+variable "license_model" {
+  type        = string
+  description = "RDS-MariaDB & RDS-MySQL: general-public-license | RDS-MSSQL: license-included | RDS Oracle: bring-your-own-license, license-included | RDS PostgreSQL: postgresql-license"
+}
 
 variable "instancetype" {
   type        = string
