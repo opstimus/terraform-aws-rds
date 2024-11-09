@@ -8,10 +8,10 @@ variable "environment" {
   description = "Environment name"
 }
 
-variable "service_name" {
+variable "name" {
   type        = string
   description = "Service name"
-  default     = null
+  default     = ""
 }
 
 variable "engine" {
