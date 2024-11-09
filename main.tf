@@ -1,6 +1,6 @@
 resource "aws_security_group" "db" {
-  name        = "${var.project}-${var.environment}-db"
-  description = "${var.project}-${var.environment}-db"
+  name        = "${var.project}-${var.environment}-${var.service_name}-db"
+  description = "${var.project}-${var.environment}-${var.service_name}-db"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -19,7 +19,7 @@ resource "aws_security_group" "db" {
   }
 
   tags = {
-    Name = "${var.project}-${var.environment}-db"
+    Name = "${var.project}-${var.environment}-${var.service_name}-db"
   }
 }
 
@@ -30,7 +30,7 @@ resource "random_password" "main" {
 }
 
 resource "aws_secretsmanager_secret" "main" {
-  name = "${var.project}-${var.environment}-db"
+  name = "${var.project}-${var.environment}-${var.service_name}-db"
 }
 resource "aws_secretsmanager_secret_version" "main" {
   secret_id     = aws_secretsmanager_secret.main.id
@@ -42,7 +42,7 @@ resource "aws_db_subnet_group" "main" {
   subnet_ids = var.private_subnet_ids
 
   tags = {
-    Name = "${var.project}-${var.environment}"
+    Name = "${var.project}-${var.environment}-${var.service_name}"
   }
 }
 
@@ -94,7 +94,7 @@ resource "aws_db_instance" "main" {
 
 resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   count                     = var.enable_cpu_alarm ? 1 : 0
-  alarm_name                = "${var.project}-${var.environment}: CPU usage on RDS '${aws_db_instance.main.id}' is high"
+  alarm_name                = "${var.project}-${var.environment}-${var.service_name}: CPU usage on RDS '${aws_db_instance.main.id}' is high"
   alarm_description         = "RDS CPU utlization high"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = 15
@@ -114,7 +114,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_high" {
 
 resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
   count                     = var.enable_cpu_alarm ? 1 : 0
-  alarm_name                = "${var.project}-${var.environment}: CPU usage on RDS '${aws_db_instance.main.id}' is critical"
+  alarm_name                = "${var.project}-${var.environment}-${var.service_name}: CPU usage on RDS '${aws_db_instance.main.id}' is critical"
   alarm_description         = "RDS CPU utlization critical"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = 15

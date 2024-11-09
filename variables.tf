@@ -8,6 +8,12 @@ variable "environment" {
   description = "Environment name"
 }
 
+variable "service_name" {
+  type        = string
+  description = "Service name"
+  default     = null
+}
+
 variable "engine" {
   type        = string
   description = "mysql, postgresql"
