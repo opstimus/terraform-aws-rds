@@ -58,6 +58,7 @@ variable "max_allocated_storage" {
 variable "db_name" {
   type        = string
   description = "Default database name"
+  default = ""
 }
 
 variable "username" {
