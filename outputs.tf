@@ -15,6 +15,7 @@ resource "aws_ssm_parameter" "username" {
 }
 
 resource "aws_ssm_parameter" "db_name" {
+  count = var.db_name != "" ? 1 : 0
   name  = "/${var.project}/${var.environment}/central/rds/db_name"
   type  = "String"
   value = var.db_name
