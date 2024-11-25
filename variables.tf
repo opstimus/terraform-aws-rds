@@ -26,6 +26,7 @@ variable "engine_version" {
 
 variable "license_model" {
   type        = string
+  default     = null
   description = "RDS-MariaDB & RDS-MySQL: general-public-license | RDS-MSSQL: license-included | RDS Oracle: bring-your-own-license, license-included | RDS PostgreSQL: postgresql-license"
 }
 
@@ -58,7 +59,7 @@ variable "max_allocated_storage" {
 variable "db_name" {
   type        = string
   description = "Default database name"
-  default = ""
+  default     = ""
 }
 
 variable "username" {
