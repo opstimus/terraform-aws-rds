@@ -187,8 +187,8 @@ resource "aws_lambda_function" "rds_scheduler" {
   runtime          = "python3.9"
   handler          = "rds_scheduler.rds_scheduler"
   role             = aws_iam_role.lambda_role.arn
-  filename         = "rds_scheduler.zip"
-  source_code_hash = filebase64sha256("rds_scheduler.zip")
+  filename         = "rds_scheduler.py"
+  source_code_hash = filebase64sha256("rds_scheduler.py")
 
   environment {
     variables = {
