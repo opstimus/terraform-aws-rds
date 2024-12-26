@@ -131,3 +131,110 @@ resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
     DBInstanceIdentifier = aws_db_instance.main.id
   }
 }
+
+resource "aws_iam_role" "lambda_role" {
+  name = "${var.project}-${var.environment}-rds-scheduler-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "lambda_policy" {
+  name        = "${var.project}-${var.environment}-rds-scheduler-policy"
+  description = "Allow Lambda to manage RDS"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "rds:StopDBInstance",
+          "rds:StartDBInstance"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+      {
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.lambda_policy.arn
+}
+
+resource "aws_lambda_function" "rds_scheduler" {
+  count            = var.enable_scheduled_shutdown ? 1 : 0
+  function_name    = "${var.project}-${var.environment}-rds-scheduler"
+  runtime          = "python3.9"
+  handler          = "rds_scheduler.rds_scheduler"
+  role             = aws_iam_role.lambda_role.arn
+  filename         = "rds_scheduler.zip"
+  source_code_hash = filebase64sha256("rds_scheduler.zip")
+
+  environment {
+    variables = {
+      DB_INSTANCE = aws_db_instance.main.id
+    }
+  }
+  tags = {
+    Name = "${var.project}-${var.environment}-rds-scheduler"
+  }
+}
+
+resource "aws_cloudwatch_event_rule" "scheduled_shutdown" {
+  count               = var.enable_scheduled_shutdown ? 1 : 0
+  name                = "${var.project}-${var.environment}-shutdown-rule"
+  schedule_expression = var.scheduled_shutdown_at
+}
+
+resource "aws_cloudwatch_event_rule" "scheduled_wakeup" {
+  count               = var.enable_scheduled_shutdown ? 1 : 0
+  name                = "${var.project}-${var.environment}-wakeup-rule"
+  schedule_expression = var.scheduled_wakeup_at
+}
+
+resource "aws_cloudwatch_event_target" "shutdown_target" {
+  count     = var.enable_scheduled_shutdown ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.shutdown.name
+  target_id = "shutdown"
+  arn       = aws_lambda_function.rds_scheduler.arn
+  input     = jsonencode({ action = "stop" })
+}
+
+resource "aws_cloudwatch_event_target" "wakeup_target" {
+  count     = var.enable_scheduled_shutdown ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.wakeup.name
+  target_id = "wakeup"
+  arn       = aws_lambda_function.rds_scheduler.arn
+  input     = jsonencode({ action = "start" })
+}
+
+resource "aws_lambda_permission" "event_permission" {
+  count         = var.enable_scheduled_shutdown ? 2 : 0
+  statement_id  = "AllowExecutionFromEventBridge-${count.index}"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.rds_scheduler.arn
+  principal     = "events.amazonaws.com"
+  source_arn    = count.index == 0 ? aws_cloudwatch_event_rule.scheduled_shutdown[0].arn : aws_cloudwatch_event_rule.scheduled_wakeup[0].arn
+}
+
+

@@ -139,3 +139,21 @@ variable "from_port" {
 variable "to_port" {
   type = number
 }
+
+variable "enable_scheduled_shutdown" {
+  type        = bool
+  description = "Enable scheduled Shutdown"
+  default     = false
+}
+
+variable "scheduled_shutdown_at" {
+  description = "Cron expression for RDS shutdown"
+  type        = string
+  default     = "cron(0 22 * * ? *)" # Default: 10 PM UTC
+}
+
+variable "scheduled_wakeup_at" {
+  description = "Cron expression for RDS wakeup"
+  type        = string
+  default     = "cron(0 6 * * ? *)" # Default: 6 AM UTC
+}
