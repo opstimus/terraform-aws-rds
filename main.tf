@@ -246,7 +246,7 @@ resource "aws_cloudwatch_event_rule" "scheduled_wakeup" {
 
 resource "aws_cloudwatch_event_target" "shutdown_target" {
   count     = var.enable_scheduled_shutdown ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.shutdown.name
+  rule      = aws_cloudwatch_event_rule.scheduled_shutdown.name
   target_id = "shutdown"
   arn       = aws_lambda_function.rds_scheduler.arn
   input     = jsonencode({ action = "stop" })
@@ -254,7 +254,7 @@ resource "aws_cloudwatch_event_target" "shutdown_target" {
 
 resource "aws_cloudwatch_event_target" "wakeup_target" {
   count     = var.enable_scheduled_shutdown ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.wakeup.name
+  rule      = aws_cloudwatch_event_rule.scheduled_wakeup.name
   target_id = "wakeup"
   arn       = aws_lambda_function.rds_scheduler.arn
   input     = jsonencode({ action = "start" })
