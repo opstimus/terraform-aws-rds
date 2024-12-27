@@ -182,19 +182,39 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
 }
 
 resource "aws_lambda_function" "rds_scheduler" {
-  count            = var.enable_scheduled_shutdown ? 1 : 0
-  function_name    = "${var.project}-${var.environment}-rds-scheduler"
-  runtime          = "python3.9"
-  handler          = "rds_scheduler.rds_scheduler"
-  role             = aws_iam_role.lambda_role.arn
-  filename         = "${path.module}/rds_scheduler.zip"
-  source_code_hash = filebase64sha256("${path.module}/rds_scheduler.zip")
+  count         = var.enable_scheduled_shutdown ? 1 : 0
+  function_name = "${var.project}-${var.environment}-rds-scheduler"
+  runtime       = "python3.9"
+  handler       = "index.rds_scheduler"
+  role          = aws_iam_role.lambda_role.arn
+
+  source_code_hash = filebase64sha256(<<EOF
+    import boto3
+    import os
+
+    def rds_scheduler(event, context):
+        action = event.get('action', None)
+        db_instance = os.environ.get('DB_INSTANCE')
+        rds = boto3.client('rds')
+
+        if action == "stop":
+            response = rds.stop_db_instance(DBInstanceIdentifier=db_instance)
+            return {"status": "stopped", "response": response}
+
+        elif action == "start":
+            response = rds.start_db_instance(DBInstanceIdentifier=db_instance)
+            return {"status": "started", "response": response}
+
+        return {"status": "unknown action"}
+    EOF
+  )
 
   environment {
     variables = {
       DB_INSTANCE = aws_db_instance.main.id
     }
   }
+
   tags = {
     Name = "${var.project}-${var.environment}-rds-scheduler"
   }
