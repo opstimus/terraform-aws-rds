@@ -181,35 +181,40 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
   policy_arn = aws_iam_policy.lambda_policy.arn
 }
 
+resource "local_file" "rds_scheduler_script" {
+  content  = <<EOT
+import boto3
+import os
+
+def rds_scheduler(event, context):
+    action = event.get('action', None)
+    db_instance = os.environ.get('DB_INSTANCE')
+    rds = boto3.client('rds')
+
+    if action == "stop":
+        response = rds.stop_db_instance(DBInstanceIdentifier=db_instance)
+        return {"status": "stopped", "response": response}
+
+    elif action == "start":
+        response = rds.start_db_instance(DBInstanceIdentifier=db_instance)
+        return {"status": "started", "response": response}
+
+    return {"status": "unknown action"}
+EOT
+  filename = "${path.module}/rds_scheduler.py"
+}
+
 data "archive_file" "rds_scheduler_zip" {
-  type           = "zip"
-  source_content = <<EOT
-      import boto3
-      import os
-
-      def rds_scheduler(event, context):
-          action = event.get('action', None)
-          db_instance = os.environ.get('DB_INSTANCE')
-          rds = boto3.client('rds')
-
-          if action == "stop":
-              response = rds.stop_db_instance(DBInstanceIdentifier=db_instance)
-              return {"status": "stopped", "response": response}
-
-          elif action == "start":
-              response = rds.start_db_instance(DBInstanceIdentifier=db_instance)
-              return {"status": "started", "response": response}
-
-          return {"status": "unknown action"}
-      EOT
-  output_path    = "${path.module}/rds_scheduler.zip"
+  type        = "zip"
+  source_file = local_file.rds_scheduler_script.filename # Correctly reference the local file here
+  output_path = "${path.module}/rds_scheduler.zip"
 }
 
 resource "aws_lambda_function" "rds_scheduler" {
   count         = var.enable_scheduled_shutdown ? 1 : 0
   function_name = "${var.project}-${var.environment}-rds-scheduler"
   runtime       = "python3.9"
-  handler       = "index.rds_scheduler"
+  handler       = "rds_scheduler.rds_scheduler"
   role          = aws_iam_role.lambda_role.arn
 
   filename         = data.archive_file.rds_scheduler_zip.output_path
