@@ -246,27 +246,29 @@ resource "aws_cloudwatch_event_rule" "scheduled_wakeup" {
 
 resource "aws_cloudwatch_event_target" "shutdown_target" {
   count     = var.enable_scheduled_shutdown ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.scheduled_shutdown.name
+  rule      = aws_cloudwatch_event_rule.scheduled_shutdown[count.index].name
   target_id = "shutdown"
-  arn       = aws_lambda_function.rds_scheduler.arn
+  arn       = aws_lambda_function.rds_scheduler[count.index].arn
   input     = jsonencode({ action = "stop" })
 }
 
 resource "aws_cloudwatch_event_target" "wakeup_target" {
   count     = var.enable_scheduled_shutdown ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.scheduled_wakeup.name
+  rule      = aws_cloudwatch_event_rule.scheduled_wakeup[count.index].name
   target_id = "wakeup"
-  arn       = aws_lambda_function.rds_scheduler.arn
+  arn       = aws_lambda_function.rds_scheduler[count.index].arn
   input     = jsonencode({ action = "start" })
 }
+
 
 resource "aws_lambda_permission" "event_permission" {
   count         = var.enable_scheduled_shutdown ? 2 : 0
   statement_id  = "AllowExecutionFromEventBridge-${count.index}"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.rds_scheduler.arn
+  function_name = aws_lambda_function.rds_scheduler[0].arn
   principal     = "events.amazonaws.com"
   source_arn    = count.index == 0 ? aws_cloudwatch_event_rule.scheduled_shutdown[0].arn : aws_cloudwatch_event_rule.scheduled_wakeup[0].arn
 }
+
 
 
