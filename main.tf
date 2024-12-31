@@ -265,7 +265,7 @@ resource "aws_lambda_permission" "event_permission" {
   count         = var.enable_scheduled_shutdown ? 2 : 0
   statement_id  = "AllowExecutionFromEventBridge-${count.index}"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.rds_scheduler.arn
+  function_name = aws_lambda_function.rds_scheduler[count.index].arn
   principal     = "events.amazonaws.com"
   source_arn    = count.index == 0 ? aws_cloudwatch_event_rule.scheduled_shutdown[0].arn : aws_cloudwatch_event_rule.scheduled_wakeup[0].arn
 }
