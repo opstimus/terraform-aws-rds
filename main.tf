@@ -212,7 +212,7 @@ data "archive_file" "rds_scheduler_zip" {
 
 resource "aws_lambda_function" "rds_scheduler" {
   count         = var.enable_scheduled_shutdown ? 1 : 0
-  function_name = "${var.project}-${var.environment}-rds-scheduler"
+  function_name = aws_lambda_function.rds_scheduler[count.index].arn
   runtime       = "python3.9"
   handler       = "rds_scheduler.rds_scheduler"
   role          = aws_iam_role.lambda_role.arn
