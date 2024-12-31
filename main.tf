@@ -206,7 +206,7 @@ EOT
 
 data "archive_file" "rds_scheduler_zip" {
   type        = "zip"
-  source_file = local_file.rds_scheduler_script.filename # Correctly reference the local file here
+  source_file = local_file.rds_scheduler_script.filename
   output_path = "${path.module}/rds_scheduler.zip"
 }
 
