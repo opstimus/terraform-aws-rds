@@ -181,28 +181,28 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
   policy_arn = aws_iam_policy.lambda_policy.arn
 }
 
-resource "local_file" "rds_scheduler_script" {
-  content  = <<EOT
-import boto3
-import os
+# resource "local_file" "rds_scheduler_script" {
+#   content  = <<EOT
+# import boto3
+# import os
 
-def rds_scheduler(event, context):
-    action = event.get('action', None)
-    db_instance = os.environ.get('DB_INSTANCE')
-    rds = boto3.client('rds')
+# def rds_scheduler(event, context):
+#     action = event.get('action', None)
+#     db_instance = os.environ.get('DB_INSTANCE')
+#     rds = boto3.client('rds')
 
-    if action == "stop":
-        response = rds.stop_db_instance(DBInstanceIdentifier=db_instance)
-        return {"status": "stopped", "response": response}
+#     if action == "stop":
+#         response = rds.stop_db_instance(DBInstanceIdentifier=db_instance)
+#         return {"status": "stopped", "response": response}
 
-    elif action == "start":
-        response = rds.start_db_instance(DBInstanceIdentifier=db_instance)
-        return {"status": "started", "response": response}
+#     elif action == "start":
+#         response = rds.start_db_instance(DBInstanceIdentifier=db_instance)
+#         return {"status": "started", "response": response}
 
-    return {"status": "unknown action"}
-EOT
-  filename = "${path.module}/rds_scheduler.py"
-}
+#     return {"status": "unknown action"}
+# EOT
+#   filename = "${path.module}/rds_scheduler.py"
+# }
 
 data "archive_file" "rds_scheduler_zip" {
   type        = "zip"
@@ -265,10 +265,9 @@ resource "aws_lambda_permission" "event_permission" {
   count         = var.enable_scheduled_shutdown ? 2 : 0
   statement_id  = "AllowExecutionFromEventBridge-${count.index}"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.rds_scheduler[0].arn
+  function_name = aws_lambda_function.rds_scheduler.arn
   principal     = "events.amazonaws.com"
   source_arn    = count.index == 0 ? aws_cloudwatch_event_rule.scheduled_shutdown[0].arn : aws_cloudwatch_event_rule.scheduled_wakeup[0].arn
 }
-
 
 
