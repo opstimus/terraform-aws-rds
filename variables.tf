@@ -8,6 +8,12 @@ variable "environment" {
   description = "Environment name"
 }
 
+variable "name" {
+  type        = string
+  description = "Service name"
+  default     = ""
+}
+
 variable "engine" {
   type        = string
   description = "mysql, postgresql"
@@ -18,6 +24,11 @@ variable "engine_version" {
   description = "i.e 5.7.33"
 }
 
+variable "license_model" {
+  type        = string
+  default     = null
+  description = "RDS-MariaDB & RDS-MySQL: general-public-license | RDS-MSSQL: license-included | RDS Oracle: bring-your-own-license, license-included | RDS PostgreSQL: postgresql-license"
+}
 
 variable "instancetype" {
   type        = string
@@ -48,6 +59,7 @@ variable "max_allocated_storage" {
 variable "db_name" {
   type        = string
   description = "Default database name"
+  default     = ""
 }
 
 variable "username" {

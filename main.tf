@@ -1,6 +1,11 @@
+locals {
+  name     = var.name != "" ? "-${var.name}" : ""
+  ssm_name = var.name != "" ? "/${var.name}" : ""
+}
+
 resource "aws_security_group" "db" {
-  name        = "${var.project}-${var.environment}-db"
-  description = "${var.project}-${var.environment}-db"
+  name        = "${var.project}-${var.environment}${local.name}-db"
+  description = "${var.project}-${var.environment}${local.name}-db"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -19,7 +24,7 @@ resource "aws_security_group" "db" {
   }
 
   tags = {
-    Name = "${var.project}-${var.environment}-db"
+    Name = "${var.project}-${var.environment}${local.name}-db"
   }
 }
 
@@ -30,7 +35,7 @@ resource "random_password" "main" {
 }
 
 resource "aws_secretsmanager_secret" "main" {
-  name = "${var.project}-${var.environment}-db"
+  name = "${var.project}-${var.environment}${local.name}-db"
 }
 resource "aws_secretsmanager_secret_version" "main" {
   secret_id     = aws_secretsmanager_secret.main.id
@@ -42,7 +47,7 @@ resource "aws_db_subnet_group" "main" {
   subnet_ids = var.private_subnet_ids
 
   tags = {
-    Name = "${var.project}-${var.environment}"
+    Name = "${var.project}-${var.environment}${local.name}"
   }
 }
 
@@ -69,6 +74,7 @@ resource "aws_db_instance" "main" {
   apply_immediately            = true
   engine                       = var.engine
   engine_version               = var.engine_version
+  license_model                = var.license_model
   parameter_group_name         = length(aws_db_parameter_group.main) > 0 ? aws_db_parameter_group.main[0].name : "default.${var.parameter_group_family}"
   auto_minor_version_upgrade   = false
   db_subnet_group_name         = aws_db_subnet_group.main.name
@@ -85,7 +91,7 @@ resource "aws_db_instance" "main" {
   snapshot_identifier          = var.snapshot_identifier != "" ? var.snapshot_identifier : null
   deletion_protection          = var.deletion_protection
   backup_retention_period      = var.backup_retention_period
-  identifier                   = "${var.project}-${var.environment}"
+  identifier                   = "${var.project}-${var.environment}${local.name}"
   storage_encrypted            = var.storage_encrypted
   kms_key_id                   = var.storage_encrypted == true ? var.kms_key_id : null
   vpc_security_group_ids       = [aws_security_group.db.id]
@@ -94,7 +100,7 @@ resource "aws_db_instance" "main" {
 
 resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   count                     = var.enable_cpu_alarm ? 1 : 0
-  alarm_name                = "${var.project}-${var.environment}: CPU usage on RDS '${aws_db_instance.main.id}' is high"
+  alarm_name                = "${var.project}-${var.environment}${local.name}: CPU usage on RDS '${aws_db_instance.main.id}' is high"
   alarm_description         = "RDS CPU utlization high"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = 15
@@ -114,7 +120,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_high" {
 
 resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
   count                     = var.enable_cpu_alarm ? 1 : 0
-  alarm_name                = "${var.project}-${var.environment}: CPU usage on RDS '${aws_db_instance.main.id}' is critical"
+  alarm_name                = "${var.project}-${var.environment}${local.name}: CPU usage on RDS '${aws_db_instance.main.id}' is critical"
   alarm_description         = "RDS CPU utlization critical"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = 15
