@@ -111,7 +111,8 @@ variable "vpc_cidr" {
 }
 
 variable "enable_performance_insights" {
-  type = bool
+  type    = bool
+  default = false
 }
 
 variable "parameter_group_parameters" {

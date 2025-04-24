@@ -36,7 +36,6 @@ This module provisions AWS RDS resources, including a DB instance, security grou
 | instancetype                | DB instance type                                                                     | `string`        | "db.t3.micro"     |   no     |
 | storage_type                | DB storage type                                                                      | `string`        | "gp2"             |   no     |
 | allocated_storage           | Allocated storage for the DB instance                                                | `number`        | -                 |   yes    |
-| autoscaling                 | Enable autoscaling for storage                                                       | `bool`          | false             |   no     |
 | max_allocated_storage       | Maximum storage for autoscaling, defining value for this enable autoscaling          | `number`        | -                 |   no     |
 | db_name                     | Default database name                                                                | `string`        | -                 |   yes    |
 | username                    | Master username for the DB                                                           | `string`        | "opadmin"         |   no     |
@@ -72,19 +71,28 @@ module "rds" {
   source                  = "https://github.com/opstimus/terraform-aws-rds?ref=v<RELEASE>"
   project                 = "my-project"
   environment             = "production"
+  name                    = "api"
   engine                  = "mysql"
   engine_version          = "5.7.33"
   instancetype            = "db.t3.medium"
+  storage_type            = "gp3"
   allocated_storage       = 100
+  max_allocated_storage   = 150
   vpc_id                  = "vpc-123456"
   private_subnet_ids      = ["subnet-123456", "subnet-654321"]
   vpc_cidr                = "10.0.0.0/16"
   db_name                 = "mydb"
   username                = "admin"
   parameter_group_family  = "mysql5.7"
+  multi_az                = false
+  skip_final_snapshot     = true
+  deletion_protection     = false
   backup_retention_period = 7
+  storage_encrypted       = true
+  enable_performance_insights = false
   enable_cpu_alarm        = true
   alarm_sns_arn           = "arn:aws:sns:us-east-1:123456789012:my-topic"
+  port                    = 3306
 }
 ```
 
