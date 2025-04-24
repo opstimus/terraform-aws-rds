@@ -25,34 +25,37 @@ This module provisions AWS RDS resources, including a DB instance, security grou
 
 ## Inputs
 
-| Name                        | Description                                    | Type            | Default           | Required |
-|-----------------------------|------------------------------------------------|-----------------|-------------------|:--------:|
-| project                     | Project name                                   | `string`        | -                 |   yes    |
-| environment                 | Environment name                               | `string`        | -                 |   yes    |
-| engine                      | Database engine (mysql, postgresql)            | `string`        | -                 |   yes    |
-| engine_version              | Database engine version                        | `string`        | -                 |   yes    |
-| instancetype                | DB instance type                               | `string`        | "db.t3.micro"     |   no     |
-| storage_type                | DB storage type                                | `string`        | "gp2"             |   no     |
-| allocated_storage           | Allocated storage for the DB instance          | `number`        | -                 |   yes    |
-| autoscaling                 | Enable autoscaling for storage                 | `bool`          | false             |   no     |
-| max_allocated_storage       | Maximum storage for autoscaling                | `number`        | -                 |   no     |
-| db_name                     | Default database name                          | `string`        | -                 |   yes    |
-| username                    | Master username for the DB                     | `string`        | "opadmin"           |   no     |
-| parameter_group_family      | DB parameter group family                      | `string`        | -                 |   yes    |
-| multi_az                    | Enable multi-AZ deployment                     | `bool`          | false             |   no     |
-| skip_final_snapshot         | Skip final snapshot before deletion            | `bool`          | true              |   no     |
-| snapshot_identifier         | Snapshot identifier for restoring the instance | `string`        | ""                |   no     |
-| deletion_protection         | Enable deletion protection                     | `bool`          | false             |   no     |
-| backup_retention_period     | Backup retention period                        | `number`        | 30                |   no     |
-| storage_encrypted           | Enable encryption for DB storage               | `bool`          | true              |   no     |
-| vpc_id                      | VPC ID for the DB instance                     | `string`        | -                 |   yes    |
-| private_subnet_ids          | List of private subnet IDs                     | `list(string)`  | -                 |   yes    |
-| vpc_cidr                    | CIDR block of the VPC                          | `string`        | -                 |   yes    |
-| enable_performance_insights | Enable performance insights                    | `bool`          | -                 |   no     |
-| parameter_group_parameters  | Parameters for the DB parameter group          | `list(object)`  | []                |   no     |
-| kms_key_id                  | KMS key ID for encryption                      | `string`        | -                 |   no     |
-| alarm_sns_arn               | SNS topic ARN for alarm notifications          | `string`        | ""                |   no     |
-| enable_cpu_alarm            | Enable CPU utilization alarms                  | `bool`          | false             |   no     |
+| Name                        | Description                                                                          | Type            | Default           | Required |
+|-----------------------------|--------------------------------------------------------------------------------------|-----------------|-------------------|:--------:|
+| project                     | Project name                                                                         | `string`        | -                 |   yes    |
+| environment                 | Environment name                                                                     | `string`        | -                 |   yes    |
+| name                        | service name                                                                         | `string`        | -                 |   yes    |
+| engine                      | Database engine (mysql, postgresql)                                                  | `string`        | -                 |   yes    |
+| engine_version              | Database engine version                                                              | `string`        | -                 |   yes    |
+| license_model               | RDS-MSSQL: license-included (Only for MSSQL)                                         | `string`        | -                 |   no     |
+| instancetype                | DB instance type                                                                     | `string`        | "db.t3.micro"     |   no     |
+| storage_type                | DB storage type                                                                      | `string`        | "gp2"             |   no     |
+| allocated_storage           | Allocated storage for the DB instance                                                | `number`        | -                 |   yes    |
+| autoscaling                 | Enable autoscaling for storage                                                       | `bool`          | false             |   no     |
+| max_allocated_storage       | Maximum storage for autoscaling, defining value for this enable autoscaling          | `number`        | -                 |   no     |
+| db_name                     | Default database name                                                                | `string`        | -                 |   yes    |
+| username                    | Master username for the DB                                                           | `string`        | "opadmin"         |   no     |
+| parameter_group_family      | DB parameter group family                                                            | `string`        | -                 |   yes    |
+| multi_az                    | Enable multi-AZ deployment                                                           | `bool`          | false             |   no     |
+| skip_final_snapshot         | Skip final snapshot before deletion                                                  | `bool`          | true              |   no     |
+| snapshot_identifier         | Snapshot identifier for restoring the instance                                       | `string`        | ""                |   no     |
+| deletion_protection         | Enable deletion protection                                                           | `bool`          | false             |   no     |
+| backup_retention_period     | Backup retention period                                                              | `number`        | 30                |   no     |
+| storage_encrypted           | Enable encryption for DB storage                                                     | `bool`          | true              |   no     |
+| vpc_id                      | VPC ID for the DB instance                                                           | `string`        | -                 |   yes    |
+| private_subnet_ids          | List of private subnet IDs                                                           | `list(string)`  | -                 |   yes    |
+| vpc_cidr                    | CIDR block of the VPC                                                                | `string`        | -                 |   yes    |
+| enable_performance_insights | Enable performance insights                                                          | `bool`          | -                 |   no     |
+| parameter_group_parameters  | Parameters for the DB parameter group                                                | `list(object)`  | []                |   no     |
+| kms_key_id                  | KMS key ID for encryption                                                            | `string`        | -                 |   no     |
+| alarm_sns_arn               | SNS topic ARN for alarm notifications                                                | `string`        | ""                |   no     |
+| enable_cpu_alarm            | Enable CPU utilization alarms                                                        | `bool`          | false             |   no     |
+| port                        | DB Port                                                                              | `number`        | 0                 |   yes    |
 
 ## Outputs
 

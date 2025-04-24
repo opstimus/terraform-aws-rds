@@ -9,8 +9,8 @@ resource "aws_security_group" "db" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port   = var.from_port
-    to_port     = var.to_port
+    from_port   = var.port
+    to_port     = var.port
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr]
   }
@@ -81,7 +81,7 @@ resource "aws_db_instance" "main" {
   instance_class               = var.instancetype
   storage_type                 = var.storage_type
   allocated_storage            = var.allocated_storage
-  max_allocated_storage        = var.autoscaling == true ? var.max_allocated_storage : null
+  max_allocated_storage        = var.max_allocated_storage
   db_name                      = var.db_name
   username                     = var.username
   password                     = random_password.main.result
