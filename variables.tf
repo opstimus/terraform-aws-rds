@@ -115,6 +115,11 @@ variable "enable_performance_insights" {
   default = false
 }
 
+variable "enabled_cloudwatch_logs_exports" {
+  type    = list(string)
+  default = []
+}
+
 variable "parameter_group_parameters" {
   type = list(object({
     name  = string

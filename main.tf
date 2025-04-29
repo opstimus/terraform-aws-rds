@@ -86,7 +86,7 @@ resource "aws_db_instance" "main" {
   username                        = var.username
   password                        = random_password.main.result
   multi_az                        = var.multi_az
-  enabled_cloudwatch_logs_exports = ["postgresql"]
+  enabled_cloudwatch_logs_exports = var.enabled_cloudwatch_logs_exports
   skip_final_snapshot             = var.skip_final_snapshot
   final_snapshot_identifier       = "${var.project}-${var.environment}-${time_static.main.unix}"
   snapshot_identifier             = var.snapshot_identifier != "" ? var.snapshot_identifier : null
