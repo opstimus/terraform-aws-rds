@@ -53,7 +53,7 @@ resource "aws_db_subnet_group" "main" {
 
 resource "aws_db_parameter_group" "main" {
   count  = length(var.parameter_group_parameters) != 0 ? 1 : 0
-  name   = "${var.project}-${var.environment}-${var.engine}"
+  name   = "${var.project}-${var.environment}-${var.engine}${local.name}"
   family = var.parameter_group_family
 
   dynamic "parameter" {
@@ -69,8 +69,8 @@ resource "aws_db_parameter_group" "main" {
 }
 
 resource "aws_db_option_group" "main" {
-  name                     = "${var.project}-${var.environment}-${var.engine}"
-  option_group_description = "${var.project}-${var.environment}-${var.engine}"
+  name                     = "${var.project}-${var.environment}-${var.engine}${local.name}"
+  option_group_description = "${var.project}-${var.environment}-${var.engine}${local.name}"
   engine_name              = var.engine
   major_engine_version     = var.major_engine_version
   dynamic "option" {
@@ -87,6 +87,9 @@ resource "aws_db_option_group" "main" {
 
       }
     }
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
