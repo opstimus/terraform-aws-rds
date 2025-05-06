@@ -56,6 +56,8 @@ This module provisions AWS RDS resources, including a DB instance, security grou
 | alarm_sns_arn                   | SNS topic ARN for alarm notifications                                            | `string`        | ""                |   no     |
 | enable_cpu_alarm                | Enable CPU utilization alarms                                                    | `bool`          | false             |   no     |
 | port                            | DB Port                                                                          | `number`        | 0                 |   yes    |
+| major_engine_version            | Option group major engine version                                                | `string`        | -                 |   yes    |
+| option_group_options            | Options for the DB options group                                                 | `list(object)`  | []                |   no     |
 
 ## Outputs
 
@@ -65,9 +67,15 @@ This module provisions AWS RDS resources, including a DB instance, security grou
 
 ## Reference Links
 
-| Name                            | Description                                                                         |
-|---------------------------------|-------------------------------------------------------------------------------------|
-| enabled_cloudwatch_logs_exports | https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html |
+| Name                            | Description                                                                             |
+|---------------------------------|---------------------------------------------------------------------------------------  |
+| enabled_cloudwatch_logs_exports | https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_CreateDBInstance.html     |
+| option_group_options - MariaDB  | https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.MariaDB.Options.html    |
+| option_group_options - MSSQL    | https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.SQLServer.Options.html  |
+| option_group_options - MySQL    | https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.MySQL.Options.html      |
+| option_group_options - Oracle   | https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.Oracle.Options.html     |
+
+
 
 ## Usage examples
 
@@ -100,6 +108,18 @@ module "rds" {
   enable_cpu_alarm            = true
   alarm_sns_arn               = "arn:aws:sns:us-east-1:123456789012:my-topic"
   port                        = 3306
+  major_engine_version        = "16.00"
+  option_group_options = [
+    {
+      option_name = "SQLSERVER_BACKUP_RESTORE"
+      option_settings = [
+        {
+          name  = "IAM_ROLE_ARN"
+          value = "role_arn"
+        }
+      ]
+    }
+  ]
 }
 ```
 

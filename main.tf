@@ -53,7 +53,7 @@ resource "aws_db_subnet_group" "main" {
 
 resource "aws_db_parameter_group" "main" {
   count  = length(var.parameter_group_parameters) != 0 ? 1 : 0
-  name   = "${var.project}-${var.environment}-${var.engine}"
+  name   = "${var.project}-${var.environment}-${var.engine}${local.name}"
   family = var.parameter_group_family
 
   dynamic "parameter" {
@@ -61,6 +61,31 @@ resource "aws_db_parameter_group" "main" {
     content {
       name  = parameter.value.name
       value = parameter.value.value
+    }
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_db_option_group" "main" {
+  name                     = "${var.project}-${var.environment}-${var.engine}${local.name}"
+  option_group_description = "${var.project}-${var.environment}-${var.engine}${local.name}"
+  engine_name              = var.engine
+  major_engine_version     = var.major_engine_version
+  dynamic "option" {
+    for_each = var.option_group_options
+    content {
+      option_name = option.value.option_name
+
+      dynamic "option_settings" {
+        for_each = option.value.option_settings
+        content {
+          name  = option_settings.value.name
+          value = option_settings.value.value
+        }
+
+      }
     }
   }
   lifecycle {
@@ -76,6 +101,7 @@ resource "aws_db_instance" "main" {
   engine_version                  = var.engine_version
   license_model                   = var.license_model
   parameter_group_name            = length(aws_db_parameter_group.main) > 0 ? aws_db_parameter_group.main[0].name : "default.${var.parameter_group_family}"
+  option_group_name               = aws_db_option_group.main.name
   auto_minor_version_upgrade      = false
   db_subnet_group_name            = aws_db_subnet_group.main.name
   instance_class                  = var.instancetype
