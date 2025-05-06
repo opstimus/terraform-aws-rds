@@ -9,8 +9,8 @@ resource "aws_security_group" "db" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port   = var.from_port
-    to_port     = var.to_port
+    from_port   = var.port
+    to_port     = var.port
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr]
   }
@@ -71,31 +71,32 @@ resource "aws_db_parameter_group" "main" {
 resource "time_static" "main" {}
 
 resource "aws_db_instance" "main" {
-  apply_immediately            = true
-  engine                       = var.engine
-  engine_version               = var.engine_version
-  license_model                = var.license_model
-  parameter_group_name         = length(aws_db_parameter_group.main) > 0 ? aws_db_parameter_group.main[0].name : "default.${var.parameter_group_family}"
-  auto_minor_version_upgrade   = false
-  db_subnet_group_name         = aws_db_subnet_group.main.name
-  instance_class               = var.instancetype
-  storage_type                 = var.storage_type
-  allocated_storage            = var.allocated_storage
-  max_allocated_storage        = var.autoscaling == true ? var.max_allocated_storage : null
-  db_name                      = var.db_name
-  username                     = var.username
-  password                     = random_password.main.result
-  multi_az                     = var.multi_az
-  skip_final_snapshot          = var.skip_final_snapshot
-  final_snapshot_identifier    = "${var.project}-${var.environment}-${time_static.main.unix}"
-  snapshot_identifier          = var.snapshot_identifier != "" ? var.snapshot_identifier : null
-  deletion_protection          = var.deletion_protection
-  backup_retention_period      = var.backup_retention_period
-  identifier                   = "${var.project}-${var.environment}${local.name}"
-  storage_encrypted            = var.storage_encrypted
-  kms_key_id                   = var.storage_encrypted == true ? var.kms_key_id : null
-  vpc_security_group_ids       = [aws_security_group.db.id]
-  performance_insights_enabled = var.enable_performance_insights
+  apply_immediately               = true
+  engine                          = var.engine
+  engine_version                  = var.engine_version
+  license_model                   = var.license_model
+  parameter_group_name            = length(aws_db_parameter_group.main) > 0 ? aws_db_parameter_group.main[0].name : "default.${var.parameter_group_family}"
+  auto_minor_version_upgrade      = false
+  db_subnet_group_name            = aws_db_subnet_group.main.name
+  instance_class                  = var.instancetype
+  storage_type                    = var.storage_type
+  allocated_storage               = var.allocated_storage
+  max_allocated_storage           = var.max_allocated_storage
+  db_name                         = var.db_name
+  username                        = var.username
+  password                        = random_password.main.result
+  multi_az                        = var.multi_az
+  enabled_cloudwatch_logs_exports = var.enabled_cloudwatch_logs_exports
+  skip_final_snapshot             = var.skip_final_snapshot
+  final_snapshot_identifier       = "${var.project}-${var.environment}-${time_static.main.unix}"
+  snapshot_identifier             = var.snapshot_identifier != "" ? var.snapshot_identifier : null
+  deletion_protection             = var.deletion_protection
+  backup_retention_period         = var.backup_retention_period
+  identifier                      = "${var.project}-${var.environment}${local.name}"
+  storage_encrypted               = var.storage_encrypted
+  kms_key_id                      = var.storage_encrypted == true ? var.kms_key_id : null
+  vpc_security_group_ids          = [aws_security_group.db.id]
+  performance_insights_enabled    = var.enable_performance_insights
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_high" {

@@ -46,11 +46,6 @@ variable "allocated_storage" {
   description = "Storage amount"
 }
 
-variable "autoscaling" {
-  type    = bool
-  default = false
-}
-
 variable "max_allocated_storage" {
   type        = number
   description = "Autoscale max storage amount"
@@ -116,7 +111,13 @@ variable "vpc_cidr" {
 }
 
 variable "enable_performance_insights" {
-  type = bool
+  type    = bool
+  default = false
+}
+
+variable "enabled_cloudwatch_logs_exports" {
+  type    = list(string)
+  default = []
 }
 
 variable "parameter_group_parameters" {
@@ -144,10 +145,7 @@ variable "enable_cpu_alarm" {
   default     = false
 }
 
-variable "from_port" {
-  type = number
-}
-
-variable "to_port" {
-  type = number
+variable "port" {
+  type    = number
+  default = 0
 }
