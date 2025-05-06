@@ -68,6 +68,28 @@ resource "aws_db_parameter_group" "main" {
   }
 }
 
+resource "aws_db_option_group" "main" {
+  name                     = "${var.project}-${var.environment}-${var.engine}"
+  option_group_description = "${var.project}-${var.environment}-${var.engine}"
+  engine_name              = var.engine
+  major_engine_version     = var.major_engine_version
+  dynamic "option" {
+    for_each = var.option_group_options
+    content {
+      option_name = option.value.option_name
+
+      dynamic "option_settings" {
+        for_each = option.value.option_settings
+        content {
+          name  = option_settings.value.name
+          value = option_settings.value.value
+        }
+
+      }
+    }
+  }
+}
+
 resource "time_static" "main" {}
 
 resource "aws_db_instance" "main" {
@@ -76,6 +98,7 @@ resource "aws_db_instance" "main" {
   engine_version                  = var.engine_version
   license_model                   = var.license_model
   parameter_group_name            = length(aws_db_parameter_group.main) > 0 ? aws_db_parameter_group.main[0].name : "default.${var.parameter_group_family}"
+  option_group_name               = aws_db_option_group.main.name
   auto_minor_version_upgrade      = false
   db_subnet_group_name            = aws_db_subnet_group.main.name
   instance_class                  = var.instancetype
