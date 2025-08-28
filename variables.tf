@@ -18,7 +18,6 @@ variable "workload" {
   type        = string
   description = "Workload tag"
   default     = "default"
-
 }
 
 variable "engine" {
