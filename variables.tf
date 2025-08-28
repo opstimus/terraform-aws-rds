@@ -14,10 +14,10 @@ variable "name" {
   default     = ""
 }
 
-variable "workload" {
-  type        = string
-  description = "Workload tag"
-  default     = "default"
+variable "tags" {
+  type        = map(string)
+  description = "A map of tags to assign to the resource."
+  default     = {}
 }
 
 variable "engine" {
