@@ -2,6 +2,10 @@ output "db_password_secret" {
   value = aws_secretsmanager_secret.main.name
 }
 
+output "db_instance_identifier" {
+  value = aws_db_instance.main.identifier
+}
+
 resource "aws_ssm_parameter" "dns" {
   name  = "/${var.project}/${var.environment}/central/rds${local.ssm_name}/dns"
   type  = "String"

@@ -149,3 +149,20 @@ variable "port" {
   type    = number
   default = 0
 }
+
+variable "major_engine_version" {
+  type        = string
+  description = "Major engine version"
+}
+
+variable "option_group_options" {
+  type = list(object({
+    option_name = string
+    option_settings = list(object({
+      name  = string
+      value = string
+    }))
+  }))
+  default = []
+
+}
