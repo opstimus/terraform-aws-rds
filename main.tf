@@ -23,10 +23,7 @@ resource "aws_security_group" "db" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = {
-    Name     = "${var.project}-${var.environment}${local.name}-db"
-    Workload = var.workload
-  }
+  tags = var.tags
 }
 
 resource "random_password" "main" {
