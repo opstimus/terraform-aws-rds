@@ -24,7 +24,8 @@ resource "aws_security_group" "db" {
   }
 
   tags = {
-    Name = "${var.project}-${var.environment}${local.name}-db"
+    Name     = "${var.project}-${var.environment}${local.name}-db"
+    Workload = var.workload
   }
 }
 
@@ -36,7 +37,12 @@ resource "random_password" "main" {
 
 resource "aws_secretsmanager_secret" "main" {
   name = "${var.project}-${var.environment}${local.name}-db"
+  tags = {
+    Name     = "${var.project}-${var.environment}${local.name}-db"
+    Workload = var.workload
+  }
 }
+
 resource "aws_secretsmanager_secret_version" "main" {
   secret_id     = aws_secretsmanager_secret.main.id
   secret_string = random_password.main.result
@@ -47,7 +53,8 @@ resource "aws_db_subnet_group" "main" {
   subnet_ids = var.private_subnet_ids
 
   tags = {
-    Name = "${var.project}-${var.environment}${local.name}"
+    Name     = "${var.project}-${var.environment}${local.name}"
+    Workload = var.workload
   }
 }
 
@@ -65,6 +72,10 @@ resource "aws_db_parameter_group" "main" {
   }
   lifecycle {
     create_before_destroy = true
+  }
+  tags = {
+    Name     = "${var.project}-${var.environment}${local.name}"
+    Workload = var.workload
   }
 }
 
@@ -90,6 +101,10 @@ resource "aws_db_option_group" "main" {
   }
   lifecycle {
     create_before_destroy = true
+  }
+  tags = {
+    Name     = "${var.project}-${var.environment}${local.name}"
+    Workload = var.workload
   }
 }
 
@@ -123,6 +138,10 @@ resource "aws_db_instance" "main" {
   kms_key_id                      = var.storage_encrypted == true ? var.kms_key_id : null
   vpc_security_group_ids          = [aws_security_group.db.id]
   performance_insights_enabled    = var.enable_performance_insights
+  tags = {
+    Name     = "${var.project}-${var.environment}${local.name}"
+    Workload = var.workload
+  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_high" {
@@ -143,6 +162,10 @@ resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.main.id
   }
+  tags = {
+    Name     = "${var.project}-${var.environment}${local.name}-cpu-high"
+    Workload = var.workload
+  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
@@ -162,5 +185,10 @@ resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
   ok_actions                = [var.alarm_sns_arn]
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.main.id
+  }
+
+  tags = {
+    Name     = "${var.project}-${var.environment}${local.name}-cpu-critical"
+    Workload = var.workload
   }
 }

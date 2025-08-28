@@ -14,6 +14,13 @@ variable "name" {
   default     = ""
 }
 
+variable "workload" {
+  type        = string
+  description = "Workload tag"
+  default     = "default"
+
+}
+
 variable "engine" {
   type        = string
   description = "mysql, postgresql"
