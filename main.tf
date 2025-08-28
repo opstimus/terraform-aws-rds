@@ -49,7 +49,7 @@ resource "aws_secretsmanager_secret_version" "main" {
 }
 
 resource "aws_db_subnet_group" "main" {
-  name       = "main"
+  name       = "${var.project}-${var.environment}${local.name}"
   subnet_ids = var.private_subnet_ids
 
   tags = {
