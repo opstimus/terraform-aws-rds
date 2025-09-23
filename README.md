@@ -58,7 +58,8 @@ This module provisions AWS RDS resources, including a DB instance, security grou
 | port                            | DB Port                                                                          | `number`        | 0                 |   yes    |
 | major_engine_version            | Option group major engine version                                                | `string`        | -                 |   yes    |
 | option_group_options            | Options for the DB options group                                                 | `list(object)`  | []                |   no     |
-
+| tags                            | tags names                                                                       | `map(string)`   |
+-                 |   no     |
 ## Outputs
 
 | Name              | Description                          |
@@ -121,6 +122,10 @@ module "rds" {
     }
   ]
 }
+  tags = {
+    Name = <project-name>
+    Environment = <environment-name>
+  }
 ```
 
 ## Notes
