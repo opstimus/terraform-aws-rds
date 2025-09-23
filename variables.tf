@@ -14,6 +14,12 @@ variable "name" {
   default     = ""
 }
 
+variable "tags" {
+  type        = map(string)
+  description = "A map of tags to assign to the resource."
+  default     = {}
+}
+
 variable "engine" {
   type        = string
   description = "mysql, postgresql"

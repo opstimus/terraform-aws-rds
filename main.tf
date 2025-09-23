@@ -23,9 +23,7 @@ resource "aws_security_group" "db" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = {
-    Name = "${var.project}-${var.environment}${local.name}-db"
-  }
+  tags = var.tags
 }
 
 resource "random_password" "main" {
@@ -36,19 +34,18 @@ resource "random_password" "main" {
 
 resource "aws_secretsmanager_secret" "main" {
   name = "${var.project}-${var.environment}${local.name}-db"
+  tags = var.tags
 }
+
 resource "aws_secretsmanager_secret_version" "main" {
   secret_id     = aws_secretsmanager_secret.main.id
   secret_string = random_password.main.result
 }
 
 resource "aws_db_subnet_group" "main" {
-  name       = "main"
+  name       = "${var.project}-${var.environment}${local.name}"
   subnet_ids = var.private_subnet_ids
-
-  tags = {
-    Name = "${var.project}-${var.environment}${local.name}"
-  }
+  tags       = var.tags
 }
 
 resource "aws_db_parameter_group" "main" {
@@ -66,6 +63,7 @@ resource "aws_db_parameter_group" "main" {
   lifecycle {
     create_before_destroy = true
   }
+  tags = var.tags
 }
 
 resource "aws_db_option_group" "main" {
@@ -91,6 +89,7 @@ resource "aws_db_option_group" "main" {
   lifecycle {
     create_before_destroy = true
   }
+  tags = var.tags
 }
 
 resource "time_static" "main" {}
@@ -123,6 +122,7 @@ resource "aws_db_instance" "main" {
   kms_key_id                      = var.storage_encrypted == true ? var.kms_key_id : null
   vpc_security_group_ids          = [aws_security_group.db.id]
   performance_insights_enabled    = var.enable_performance_insights
+  tags                            = var.tags
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_high" {
@@ -143,6 +143,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.main.id
   }
+  tags = var.tags
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
@@ -163,4 +164,5 @@ resource "aws_cloudwatch_metric_alarm" "cpu_critical" {
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.main.id
   }
+  tags = var.tags
 }
