@@ -124,7 +124,7 @@ resource "aws_db_instance" "main" {
   performance_insights_enabled    = var.enable_performance_insights
   tags                            = var.tags
   lifecycle {
-    ignore_changes = var.ignore_changes
+    ignore_changes = [var.ignore_changes]
   }
 }
 
