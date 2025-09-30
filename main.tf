@@ -23,7 +23,12 @@ resource "aws_security_group" "db" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = var.tags
+  tags = merge(
+    {
+      Name = "${var.project}-${var.environment}${local.name}-db"
+    },
+    var.tags
+  )
 }
 
 resource "random_password" "main" {
@@ -63,7 +68,13 @@ resource "aws_db_parameter_group" "main" {
   lifecycle {
     create_before_destroy = true
   }
-  tags = var.tags
+
+  tags = merge(
+    {
+      Name = "${var.project}-${var.environment}${local.name}"
+    },
+    var.tags
+  )
 }
 
 resource "aws_db_option_group" "main" {
