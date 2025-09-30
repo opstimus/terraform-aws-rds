@@ -123,9 +123,6 @@ resource "aws_db_instance" "main" {
   vpc_security_group_ids          = [aws_security_group.db.id]
   performance_insights_enabled    = var.enable_performance_insights
   tags                            = var.tags
-  lifecycle {
-    ignore_changes = [var.ignore_changes]
-  }
 }
 
 resource "aws_db_instance" "read_replica" {

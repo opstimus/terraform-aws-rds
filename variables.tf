@@ -178,8 +178,3 @@ variable "option_group_options" {
   default = []
 
 }
-
-variable "ignore_changes" {
-  type    = list(string)
-  default = []
-}
