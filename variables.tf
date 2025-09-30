@@ -20,6 +20,12 @@ variable "tags" {
   default     = {}
 }
 
+variable "enable_read_replica" {
+  type        = bool
+  default     = false
+  description = "Enable read replica"
+}
+
 variable "engine" {
   type        = string
   description = "mysql, postgresql"
@@ -171,4 +177,9 @@ variable "option_group_options" {
   }))
   default = []
 
+}
+
+variable "ignore_changes" {
+  type    = list(string)
+  default = []
 }

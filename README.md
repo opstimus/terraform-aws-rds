@@ -58,8 +58,9 @@ This module provisions AWS RDS resources, including a DB instance, security grou
 | port                            | DB Port                                                                          | `number`        | 0                 |   yes    |
 | major_engine_version            | Option group major engine version                                                | `string`        | -                 |   yes    |
 | option_group_options            | Options for the DB options group                                                 | `list(object)`  | []                |   no     |
-| tags                            | tags names                                                                       | `map(string)`   |
--                 |   no     |
+| tags                            | tags names                                                                       | `map(string)`       |   -               |   no     |
+| enable_read_replica             | Option to enable read replica                                                    | `bool`          |  false            |   no     |
+| ignore_changes                  | Values that need to be exclude when terraform apply                              | `list(string)`  |   -               |   no     |
 ## Outputs
 
 | Name              | Description                          |

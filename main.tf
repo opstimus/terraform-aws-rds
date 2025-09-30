@@ -123,6 +123,17 @@ resource "aws_db_instance" "main" {
   vpc_security_group_ids          = [aws_security_group.db.id]
   performance_insights_enabled    = var.enable_performance_insights
   tags                            = var.tags
+  lifecycle {
+    ignore_changes = var.ignore_changes
+  }
+}
+
+resource "aws_db_instance" "read_replica" {
+  count               = var.enable_read_replica ? 1 : 0
+  replicate_source_db = aws_db_instance.main.identifier
+  identifier          = "${aws_db_instance.main.identifier}-ro"
+  instance_class      = var.instancetype
+  tags                = var.tags
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_high" {
