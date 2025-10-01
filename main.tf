@@ -137,15 +137,13 @@ resource "aws_db_instance" "main" {
 }
 
 resource "aws_db_instance" "read_replica" {
-  count                 = var.enable_read_replica ? 1 : 0
-  replicate_source_db   = aws_db_instance.main.identifier
-  identifier            = "${aws_db_instance.main.identifier}-ro"
-  instance_class        = var.instancetype
-  allocated_storage     = var.allocated_storage
-  max_allocated_storage = var.max_allocated_storage
-  storage_encrypted     = var.storage_encrypted
-  kms_key_id            = var.storage_encrypted == true ? var.kms_key_id : null
-  tags                  = var.tags
+  count               = var.enable_read_replica ? 1 : 0
+  replicate_source_db = aws_db_instance.main.identifier
+  identifier          = "${aws_db_instance.main.identifier}-ro"
+  instance_class      = var.instancetype
+  storage_encrypted   = var.storage_encrypted
+  kms_key_id          = var.storage_encrypted == true ? var.kms_key_id : null
+  tags                = var.tags
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_high" {
