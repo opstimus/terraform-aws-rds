@@ -36,7 +36,7 @@ This module provisions AWS RDS resources, including a DB instance, security grou
 | instancetype                    | DB instance type                                                                 | `string`        | "db.t3.micro"     |   no     |
 | storage_type                    | DB storage type                                                                  | `string`        | "gp2"             |   no     |
 | allocated_storage               | Allocated storage for the DB instance                                            | `number`        | -                 |   yes    |
-| max_allocated_storage           | Maximum storage for autoscaling, defining value for this enable autoscaling      | `number`        | -                 |   no     |
+| max_allocated_storage           | Maximum storage for autoscaling, defining value for this enable autoscaling      | `number`        | null              |   no     |
 | db_name                         | Default database name                                                            | `string`        | -                 |   yes    |
 | username                        | Master username for the DB                                                       | `string`        | "opadmin"         |   no     |
 | parameter_group_family          | DB parameter group family                                                        | `string`        | -                 |   yes    |
@@ -52,20 +52,22 @@ This module provisions AWS RDS resources, including a DB instance, security grou
 | enable_performance_insights     | Enable performance insights                                                      | `bool`          | -                 |   no     |
 | enabled_cloudwatch_logs_exports | Exports log types , refer below link                                             | `list(string)`  | []                |   no     |
 | parameter_group_parameters      | Parameters for the DB parameter group                                            | `list(object)`  | []                |   no     |
-| kms_key_id                      | KMS key ID for encryption                                                        | `string`        | -                 |   no     |
+| kms_key_id                      | KMS key ID for encryption                                                        | `string`        | null              |   no     |
 | alarm_sns_arn                   | SNS topic ARN for alarm notifications                                            | `string`        | ""                |   no     |
 | enable_cpu_alarm                | Enable CPU utilization alarms                                                    | `bool`          | false             |   no     |
 | port                            | DB Port                                                                          | `number`        | 0                 |   yes    |
 | major_engine_version            | Option group major engine version                                                | `string`        | -                 |   yes    |
 | option_group_options            | Options for the DB options group                                                 | `list(object)`  | []                |   no     |
-| tags                            | tags names                                                                       | `map(string)`       |   -               |   no     |
 | enable_read_replica             | Option to enable read replica                                                    | `bool`          |  false            |   no     |
-| ignore_changes                  | Values that need to be exclude when terraform apply                              | `list(string)`  |   -               |   no     |
+| tags                            | tags names                                                                       | `map(string)`       |   -               |   no     |
+
+
 ## Outputs
 
 | Name              | Description                          |
 |-------------------|--------------------------------------|
 | db_password_secret| The name of the Secrets Manager secret for the DB password |
+| db_instance_identifier | The identifier of the DB instance |
 
 ## Reference Links
 
@@ -122,11 +124,12 @@ module "rds" {
       ]
     }
   ]
-}
+  enable_read_replica         = false
   tags = {
-    Name = <project-name>
-    Environment = <environment-name>
+    Name = "my-project"
+    Environment = "production"
   }
+}
 ```
 
 ## Notes
