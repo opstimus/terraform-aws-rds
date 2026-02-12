@@ -7,7 +7,12 @@ resource "aws_security_group" "db" {
   name        = "${var.project}-${var.environment}${local.name}-db"
   description = "${var.project}-${var.environment}${local.name}-db"
   vpc_id      = var.vpc_id
-  tags        = var.tags
+  tags = merge(
+    {
+      Name = "${var.project}-${var.environment}${local.name}-db"
+    },
+    var.tags
+  )
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ingress_vpc" {
@@ -28,12 +33,6 @@ resource "aws_vpc_security_group_egress_rule" "ipv6" {
   security_group_id = aws_security_group.db.id
   ip_protocol       = "-1"
   cidr_ipv6         = "::/0"
-  tags = merge(
-    {
-      Name = "${var.project}-${var.environment}${local.name}-db"
-    },
-    var.tags
-  )
 }
 
 resource "random_password" "main" {
