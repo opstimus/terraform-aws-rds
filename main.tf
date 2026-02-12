@@ -23,7 +23,12 @@ resource "aws_security_group" "db" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
-  tags = var.tags
+  tags = merge(
+    {
+      Name = "${var.project}-${var.environment}${local.name}-db"
+    },
+    var.tags
+  )
 }
 
 resource "random_password" "main" {
@@ -63,7 +68,13 @@ resource "aws_db_parameter_group" "main" {
   lifecycle {
     create_before_destroy = true
   }
-  tags = var.tags
+
+  tags = merge(
+    {
+      Name = "${var.project}-${var.environment}${local.name}"
+    },
+    var.tags
+  )
 }
 
 resource "aws_db_option_group" "main" {
@@ -123,6 +134,17 @@ resource "aws_db_instance" "main" {
   vpc_security_group_ids          = [aws_security_group.db.id]
   performance_insights_enabled    = var.enable_performance_insights
   tags                            = var.tags
+}
+
+resource "aws_db_instance" "read_replica" {
+  count                 = var.enable_read_replica ? 1 : 0
+  replicate_source_db   = aws_db_instance.main.identifier
+  identifier            = "${aws_db_instance.main.identifier}-ro"
+  instance_class        = var.instancetype
+  max_allocated_storage = var.max_allocated_storage
+  storage_encrypted     = var.storage_encrypted
+  kms_key_id            = var.storage_encrypted == true ? var.kms_key_id : null
+  tags                  = var.tags
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_high" {
