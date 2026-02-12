@@ -134,8 +134,9 @@ variable "enabled_cloudwatch_logs_exports" {
 
 variable "parameter_group_parameters" {
   type = list(object({
-    name  = string
-    value = string
+    name         = string
+    value        = string
+    apply_method = string
   }))
   default = []
 }
