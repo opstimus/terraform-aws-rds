@@ -7,31 +7,27 @@ resource "aws_security_group" "db" {
   name        = "${var.project}-${var.environment}${local.name}-db"
   description = "${var.project}-${var.environment}${local.name}-db"
   vpc_id      = var.vpc_id
-
-  tags = var.tags
+  tags        = var.tags
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ingress_vpc" {
   security_group_id = aws_security_group.db.id
-
-  ip_protocol = "tcp"
-  from_port   = var.port
-  to_port     = var.port
-  cidr_ipv4   = var.vpc_cidr
+  ip_protocol       = "tcp"
+  from_port         = var.port
+  to_port           = var.port
+  cidr_ipv4         = var.vpc_cidr
 }
 
 resource "aws_vpc_security_group_egress_rule" "ipv4" {
   security_group_id = aws_security_group.db.id
-
-  ip_protocol = "-1"
-  cidr_ipv4   = "0.0.0.0/0"
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
 }
 
 resource "aws_vpc_security_group_egress_rule" "ipv6" {
   security_group_id = aws_security_group.db.id
-
-  ip_protocol = "-1"
-  cidr_ipv6   = "::/0"
+  ip_protocol       = "-1"
+  cidr_ipv6         = "::/0"
 }
 
 resource "random_password" "main" {
