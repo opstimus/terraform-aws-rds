@@ -138,7 +138,7 @@ resource "aws_db_instance" "main" {
   kms_key_id                      = var.storage_encrypted == true ? var.kms_key_id : null
   vpc_security_group_ids          = [aws_security_group.db.id]
   performance_insights_enabled    = var.enable_performance_insights
-  timezone                        = var.timezone
+  timezone                        = startswith(var.engine, "sqlserver") ? var.timezone : null
   tags                            = var.tags
 }
 
