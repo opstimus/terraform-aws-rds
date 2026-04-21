@@ -127,6 +127,11 @@ variable "enable_performance_insights" {
   default = false
 }
 
+variable "timezone" {
+  type    = string
+  default = "UTC"
+}
+
 variable "enabled_cloudwatch_logs_exports" {
   type    = list(string)
   default = []
