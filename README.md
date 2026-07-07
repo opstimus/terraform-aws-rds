@@ -1,3 +1,11 @@
+> ⚠️ **Moved to the monorepo.**
+> This module now lives in [`opstimus/terraform-modules`](https://github.com/opstimus/terraform-modules) at `modules/aws-rds`.
+>
+> ```hcl
+> source = "git::https://github.com/opstimus/terraform-modules.git//modules/aws-rds?ref=aws-rds/v2.0.1"
+> ```
+>
+> This repository remains for existing consumers; new development happens in the monorepo.
 # AWS RDS Module
 
 ## Description
